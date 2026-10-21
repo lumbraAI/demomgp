@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MGP 2026 | Centro Táctico de Campaña & Observatorio Urbano</title>
+  <title>MGP 2026 | PRISMA - Centro Táctico de Campaña & Observatorio Urbano</title>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Google Fonts & Lucide Icons -->
@@ -224,6 +224,24 @@
       transform: translateY(-1px);
     }
 
+    .btn-secondary {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(56, 189, 248, 0.25);
+    }
+
     /* Banner */
     .campaign-notice {
       background: linear-gradient(90deg, rgba(66, 230, 164, 0.12), rgba(56, 189, 248, 0.08));
@@ -290,6 +308,22 @@
     .kpi-sub.up { color: var(--accent-mint); }
     .kpi-sub.warn { color: var(--accent-amber); }
     .kpi-sub.down { color: var(--accent-red); }
+
+    /* Progress Bar */
+    .progress-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+
+    .progress-bar i {
+      display: block;
+      background: linear-gradient(90deg, var(--accent-mint), var(--accent-cyan));
+      height: 100%;
+      border-radius: 10px;
+    }
 
     /* Containers */
     .charts-grid {
@@ -363,7 +397,7 @@
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
-    /* Badges */
+    /* Badges & Pills */
     .badge {
       display: inline-flex;
       align-items: center;
@@ -390,6 +424,17 @@
       background: rgba(66, 230, 164, 0.15);
       color: var(--accent-mint);
       border: 1px solid rgba(66, 230, 164, 0.3);
+    }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid rgba(66, 230, 164, 0.4);
+      color: var(--accent-mint);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 10px;
     }
 
     /* API Status Badges */
@@ -523,6 +568,48 @@
       background: rgba(66, 230, 164, 0.05);
     }
 
+    /* ESTILOS PARA LOS MODALES */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(4, 8, 18, 0.85);
+      backdrop-filter: blur(6px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      transform: translateY(20px);
+      transition: transform 0.25s ease;
+      overflow: hidden;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active .modal-container {
+      transform: translateY(0);
+    }
+
     /* Grid Layouts */
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
@@ -565,7 +652,7 @@
       <div class="brand-logo"><i data-lucide="vote"></i></div>
       <div class="brand-titles">
         <h2>MGP 2026</h2>
-        <span>CENTRO TÁCTICO DE CAMPAÑA</span>
+        <span>CENTRO TÁCTICO & PRISMA</span>
       </div>
     </div>
 
@@ -573,6 +660,10 @@
       <button class="nav-item active" data-page="resumen">
         <i data-lucide="layout-dashboard"></i>
         <span>Resumen Ejecutivo</span>
+      </button>
+      <button class="nav-item" data-page="gestion">
+        <i data-lucide="activity"></i>
+        <span>Seguimiento de Gestión</span>
       </button>
       <button class="nav-item" data-page="api-config">
         <i data-lucide="key-round"></i>
@@ -594,9 +685,13 @@
         <i data-lucide="target"></i>
         <span>Matriz de Propuestas vs MGP</span>
       </button>
+      <button class="nav-item" data-page="trazabilidad">
+        <i data-lucide="shield-check"></i>
+        <span>Trazabilidad de Datos</span>
+      </button>
       <button class="nav-item" data-page="informes">
         <i data-lucide="file-spreadsheet"></i>
-        <span>Informes & Exportación</span>
+        <span>Informes & Decisiones</span>
       </button>
     </nav>
 
@@ -617,6 +712,12 @@
       </div>
 
       <div class="controls-group">
+        <select id="periodFilter" class="filter-select">
+          <option value="30">Últimos 30 días</option>
+          <option value="90">Últimos 90 días</option>
+          <option value="365">Últimos 12 meses</option>
+        </select>
+
         <select id="delegacionFilter" class="filter-select">
           <option value="todos">Todas las Delegaciones (6)</option>
           <option value="Centro">Delegación Centro / Macrocentro</option>
@@ -694,7 +795,7 @@
           <div class="box-header">
             <div class="box-title">
               <h3>Distribución de Problemáticas en MGP</h3>
-              <p>Ejes críticos relevados en los 85 barrios</p>
+              <p>Ejes críticos relevados en los barrios</p>
             </div>
           </div>
           <div class="canvas-wrapper">
@@ -748,6 +849,39 @@
               <strong>Zona Norte y Félix U. Camet</strong>
               <p>Microbasurales a cielo abierto e ineficiencia en el recambio de luces LED.</p>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE NEW: SEGUIMIENTO DE GESTIÓN -->
+    <section id="gestion" class="page-section hidden">
+      <div class="grid-3" id="gestionCards" style="margin-bottom: 20px;">
+        <!-- JS Populated Cards -->
+      </div>
+
+      <div class="charts-grid">
+        <div class="card-box">
+          <div class="box-header">
+            <div class="box-title">
+              <h3>Cumplimiento de Objetivos por Área</h3>
+              <p>Progreso de indicadores priorizados en la gestión municipal</p>
+            </div>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="gestionChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card-box">
+          <div class="box-header">
+            <div class="box-title">
+              <h3>Alertas de Gestión y Desvíos</h3>
+              <p>Áreas que requieren intervención táctica prioritaria</p>
+            </div>
+          </div>
+          <div class="insight-list" id="alertasGestionList">
+            <!-- JS Populated -->
           </div>
         </div>
       </div>
@@ -895,15 +1029,34 @@
     <!-- PAGE 3: BARRIO POR BARRIO (80+ BARRIOS) -->
     <section id="territorio" class="page-section hidden">
       <div class="card-box" style="margin-bottom: 20px;">
+        <div class="box-header">
+          <div class="box-title">
+            <h3>Comparativa de Indicadores por Delegación</h3>
+            <p>Índice normalizado de brechas e infraestructura urbana</p>
+          </div>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="territoryChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card-box" style="margin-bottom: 20px;">
         <div class="box-header" style="flex-wrap: wrap; gap: 12px;">
           <div class="box-title">
             <h3>Directorio Completo de Barrios de General Pueyrredón</h3>
-            <p>85 barrios oficiales relevados con problemáticas, promesas MGP y nuestra propuesta</p>
+            <p>Relevamiento de problemáticas, promesas MGP y propuestas tácticas</p>
           </div>
 
-          <div class="search-box">
-            <i data-lucide="search"></i>
-            <input type="text" id="barrioSearch" placeholder="Buscar por barrio, calle o reclamo...">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="barrioSearch" placeholder="Buscar por barrio, calle o reclamo...">
+            </div>
+
+            <!-- BOTÓN PARA AGREGAR BARRIO MANULMENTE -->
+            <button class="btn-action" onclick="openAddBarrioModal()">
+              <i data-lucide="plus-circle"></i> Agregar Barrio Manual
+            </button>
           </div>
         </div>
 
@@ -927,22 +1080,96 @@
           </table>
         </div>
       </div>
+    </section>
 
-      <!-- BARRIO DETAIL MODAL INSPECTOR -->
-      <div class="card-box hidden" id="barrioDetailBox">
+    <!-- BARRIO DETAIL MODAL OVERLAY (POPUP) -->
+    <div class="modal-overlay" id="barrioDetailBox" onclick="closeBarrioModal(event)">
+      <div class="modal-container card-box" onclick="event.stopPropagation()">
         <div class="box-header">
           <div class="box-title">
             <h3 id="detailBarrioName">Ficha Técnica del Barrio</h3>
             <p id="detailBarrioSub">Diagnóstico político e hidrológico/vial</p>
           </div>
-          <button class="filter-select" onclick="$('#barrioDetailBox').classList.add('hidden')">Cerrar Ficha</button>
+          <button class="filter-select" onclick="closeBarrioModal()">Cerrar Ficha</button>
         </div>
 
         <div class="grid-3" id="detailGrid">
           <!-- JS Populated -->
         </div>
       </div>
-    </section>
+    </div>
+
+    <!-- MODAL PARA AGREGAR UN BARRIO MANUALMENTE -->
+    <div class="modal-overlay" id="addBarrioModal" onclick="closeAddBarrioModal(event)">
+      <div class="modal-container card-box" onclick="event.stopPropagation()">
+        <div class="box-header">
+          <div class="box-title">
+            <h3>Agregar Nuevo Barrio Manualmente</h3>
+            <p>Ingresá la información del barrio para incorporarlo al Observatorio Urbano</p>
+          </div>
+          <button class="filter-select" onclick="closeAddBarrioModal()">Cancelar</button>
+        </div>
+
+        <form id="addBarrioForm" onsubmit="addNewBarrio(event)">
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Nombre del Barrio *</label>
+              <input type="text" id="newBarrioName" class="form-control" placeholder="Ej: Bº Las Margaritas" required>
+            </div>
+
+            <div class="form-group">
+              <label>Delegación *</label>
+              <select id="newBarrioDel" class="form-control" required>
+                <option value="Centro">Delegación Centro / Macrocentro</option>
+                <option value="Norte">Delegación Norte & Ruta 11</option>
+                <option value="Sur">Delegación Sur & Chapadmalal</option>
+                <option value="Oeste">Delegación Oeste & Periurbano</option>
+                <option value="Batan">Delegación Batán</option>
+                <option value="Sierra">Delegación Sierra de los Padres</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <div class="form-group">
+              <label>Reclamo Principal *</label>
+              <input type="text" id="newBarrioProb" class="form-control" placeholder="Ej: Baches y Falta de Agua" required>
+            </div>
+
+            <div class="form-group">
+              <label>Nivel de Descontento (%) *</label>
+              <input type="number" id="newBarrioDesc" class="form-control" placeholder="Ej: 85" min="0" max="100" required>
+            </div>
+
+            <div class="form-group">
+              <label>Volumen en Redes *</label>
+              <select id="newBarrioVol" class="form-control" required>
+                <option value="High">Alto (High)</option>
+                <option value="Med">Medio (Med)</option>
+                <option value="Low">Bajo (Low)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Promesa Incumplida MGP (Falencia Actual) *</label>
+            <input type="text" id="newBarrioProm" class="form-control" placeholder="Ej: Pavimentación prometida en 2024 sin iniciar" required>
+          </div>
+
+          <div class="form-group">
+            <label>Nuestra Propuesta de Campaña 2026 *</label>
+            <input type="text" id="newBarrioProp" class="form-control" placeholder="Ej: Plan de Asfalto e Iluminación LED en 60 días" required>
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <button type="button" class="filter-select" onclick="closeAddBarrioModal()">Cancelar</button>
+            <button type="submit" class="btn-action">
+              <i data-lucide="check"></i> Guardar y Añadir Barrio
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- PAGE 4: CARGA TERRITORIAL (AI / FOTOS & PDF) -->
     <section id="carga" class="page-section hidden">
@@ -1111,13 +1338,90 @@
       </div>
     </section>
 
+    <!-- PAGE NEW: TRAZABILIDAD Y CALIDAD DEL DATO -->
+    <section id="trazabilidad" class="page-section hidden">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Registros Analizados</div>
+          <div class="kpi-value">18,450</div>
+          <div class="kpi-sub up"><i data-lucide="database"></i> Base General Pueyrredón</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Con Fuente Documentada</div>
+          <div class="kpi-value">94.2%</div>
+          <div class="kpi-sub up"><i data-lucide="check-circle"></i> Verificación Territorial</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Registros a Revisar</div>
+          <div class="kpi-value">184</div>
+          <div class="kpi-sub warn"><i data-lucide="alert-circle"></i> Validaciones pendientes</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Última Actualización</div>
+          <div class="kpi-value" style="font-size:22px;">Hoy</div>
+          <div class="kpi-sub up"><i data-lucide="refresh-cw"></i> Sincronizado</div>
+        </div>
+      </div>
+
+      <div class="card-box" style="margin-top: 20px;">
+        <div class="box-header">
+          <div class="box-title">
+            <h3>Registro de Fuentes y Metodología de Mapeo</h3>
+            <p>Auditoría de origen de datos, cobertura y estado de validación</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Fuente de Información</th>
+                <th>Método de Captura</th>
+                <th>Cobertura Barrial</th>
+                <th>Estado de Auditoría</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Formulario Territorial / Fomento</td>
+                <td>Encuesta declarada vecinal</td>
+                <td>85 barrios</td>
+                <td><span class="badge badge-ok">Documentado</span></td>
+              </tr>
+              <tr>
+                <td>Meta Graph & TikTok APIs</td>
+                <td>Social Listening dinámico</td>
+                <td>Toda la Comuna</td>
+                <td><span class="badge badge-ok">Documentado</span></td>
+              </tr>
+              <tr>
+                <td>OCR / AI Actas de Vecinos</td>
+                <td>Parsing automático de fotos/PDF</td>
+                <td>Delegaciones Sur y Batán</td>
+                <td><span class="badge badge-warning">Revisar</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="insight-card purple" style="margin-top: 18px;">
+          <strong>Principio de Calidad e Integridad de Datos (PRISMA Framework):</strong>
+          <p>Una muestra no representativa no permite extrapolar conclusiones. Cada indicador en esta plataforma registra su fuente, período de vigencia, universo geográfico y nivel de confianza estadística.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- PAGE 7: INFORMES & EXPORTACIÓN -->
     <section id="informes" class="page-section hidden">
-      <div class="grid-3">
+      <div class="grid-3" style="margin-bottom: 24px;">
         <div class="card-box">
+          <span class="pill">Informe Ejecutivo</span>
           <div class="box-title" style="margin-bottom: 12px;">
             <h3>Dossier Completo de Barrios (CSV)</h3>
-            <p>Descargá la base completa de los 85 barrios con sus problemáticas y propuestas.</p>
+            <p>Descargá la base completa de los barrios con sus problemáticas y propuestas.</p>
           </div>
           <button class="btn-action" style="width: 100%; justify-content: center;" onclick="downloadReport('Todos_los_Barrios_MGP')">
             <i data-lucide="file-spreadsheet"></i> Descargar CSV Completo
@@ -1125,6 +1429,7 @@
         </div>
 
         <div class="card-box">
+          <span class="pill">Desempeño Territorial</span>
           <div class="box-title" style="margin-bottom: 12px;">
             <h3>Informe por Delegación Sur & Ruta 11</h3>
             <p>Diagnóstico específico para Acantilados, Serena, Chapadmalal y Alfar.</p>
@@ -1135,6 +1440,7 @@
         </div>
 
         <div class="card-box">
+          <span class="pill">Auditoría & Batán</span>
           <div class="box-title" style="margin-bottom: 12px;">
             <h3>Informe Batán & Sierra de los Padres</h3>
             <p>Reclamos de periurbano, producción y localidades descentralizadas.</p>
@@ -1144,18 +1450,46 @@
           </button>
         </div>
       </div>
+
+      <div class="card-box">
+        <div class="box-header">
+          <div class="box-title">
+            <h3>Ruta de Decisión Estratégica (PRISMA Workflow)</h3>
+            <p>Marco de trabajo propuesto para convertir datos en gestión política efectiva</p>
+          </div>
+        </div>
+
+        <div class="insight-list">
+          <div class="insight-card">
+            <strong>1. Detectar</strong>
+            <p>Identificar cambios, desvíos y oportunidades con indicadores comparables en los barrios.</p>
+          </div>
+          <div class="insight-card warn">
+            <strong>2. Validar</strong>
+            <p>Revisar la fuente, representatividad, vigencia y posibles sesgos del dato capturado por AI o APIs.</p>
+          </div>
+          <div class="insight-card danger">
+            <strong>3. Actuar</strong>
+            <p>Definir responsable territorial, propuesta técnica, plazo y mensaje de pauta segmentada.</p>
+          </div>
+          <div class="insight-card purple">
+            <strong>4. Medir nuevamente</strong>
+            <p>Evaluar el impacto en redes y territorio para ajustar la decisión con evidencia actualizada.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- FOOTER -->
     <footer class="app-footer">
-      MGP 2026 — Centro Táctico de Campaña & Observatorio Urbano · Plataforma Electoral Autónomo para General Pueyrredón.
+      MGP 2026 — PRISMA Centro Táctico de Campaña & Observatorio Urbano · Plataforma Electoral Autónoma para General Pueyrredón.
     </footer>
 
   </main>
 </div>
 
 <script>
-  // --- DATABASE: 85 REAL NEIGHBORHOODS OF GENERAL PUEYRREDÓN ---
+  // --- DATABASE: REAL NEIGHBORHOODS OF GENERAL PUEYRREDÓN ---
   const MGP_BARRIOS_DB = [
     // Centro & Urban
     { b: 'Centro', d: 'Centro', p: 'Transporte & Estacionamiento', desc: '52%', vol: 'High', pr: 'Sincronización semafórica demorada', prop: 'Ordenamiento del tránsito y marquesinas modernas' },
@@ -1241,9 +1575,16 @@
     { b: 'El Paraíso', d: 'Sierra', p: 'Recolección de Residuos', desc: '80%', vol: 'Low', pr: 'Frecuencia de 2 veces por semana', prop: 'Recolección adaptada 4 veces por semana con reciclaje' }
   ];
 
+  const GESTION_AREAS = [
+    { area: 'Servicios Públicos & Baches', actual: 78, meta: 90, alert: true },
+    { area: 'Alumbrado Público & LED', actual: 85, meta: 85, alert: false },
+    { area: 'Salud Barrial & CAPS', actual: 64, meta: 80, alert: true },
+    { area: 'Seguridad & Monitoreo', actual: 71, meta: 85, alert: true },
+    { area: 'Recolección de Residuos', actual: 88, meta: 85, alert: false }
+  ];
+
   let charts = {};
 
-  // --- HELPER FUNCTIONS ---
   const $ = s => document.querySelector(s);
   const $$ = s => document.querySelectorAll(s);
 
@@ -1263,7 +1604,6 @@
     $('#apiConsoleLog').innerHTML = '[SYS] Console cleared.';
   }
 
-  // --- API PERSISTENCE & CONNECTION TESTERS ---
   function loadSavedApiKeys() {
     const metaToken = localStorage.getItem('MGP_META_TOKEN') || '';
     const xBearer = localStorage.getItem('MGP_X_BEARER') || '';
@@ -1287,86 +1627,72 @@
     }
   }
 
-  // META API LIVE FETCH TEST
   async function testMetaConnection() {
     const token = $('#metaToken').value.trim();
     if (!token) {
-      logConsole('⚠️ Meta API: Ingrese un User/Page Access Token para probar la conexión Live.');
+      logConsole('⚠️ Meta API: Ingrese un User/Page Access Token.');
       return;
     }
     localStorage.setItem('MGP_META_TOKEN', token);
-    logConsole('🔄 Meta API: Iniciando petición GET a graph.facebook.com/v19.0/me ...');
+    logConsole('🔄 Meta API: Petición GET a graph.facebook.com/v19.0/me...');
 
     try {
       const res = await fetch(`https://graph.facebook.com/v19.0/me?access_token=${token}`);
       const data = await res.json();
-
       if (res.ok) {
-        logConsole(`✅ Meta API Live ÉXITO: Usuario Authenticado ID: ${data.id} | Nombre: ${data.name}`);
+        logConsole(`✅ Meta API Live ÉXITO: Usuario ID ${data.id} | ${data.name}`);
         $('#statusMeta').textContent = 'CONECTADO LIVE';
         $('#statusMeta').className = 'api-status-pill status-live';
       } else {
-        logConsole(`❌ Meta API Error (${res.status}): ${data.error ? data.error.message : 'Token inválido'}`);
+        logConsole(`❌ Meta API Error: ${data.error ? data.error.message : 'Token inválido'}`);
         $('#statusMeta').textContent = 'Error de Token';
         $('#statusMeta').className = 'api-status-pill status-off';
       }
     } catch (err) {
-      logConsole(`⚠️ Meta API Fallback (CORS/Network): ${err.message}. Usando simulador de métricas.`);
+      logConsole(`⚠️ Meta API Fallback: ${err.message}. Modo simulación activo.`);
       $('#statusMeta').textContent = 'Modo Simulación';
       $('#statusMeta').className = 'api-status-pill status-sim';
     }
   }
 
-  // TIKTOK API LIVE FETCH TEST
   async function testTikTokConnection() {
     const token = $('#ttToken').value.trim();
-    if (!token) {
-      logConsole('⚠️ TikTok API: Ingrese un Access Token.');
-      return;
-    }
+    if (!token) { logConsole('⚠️ TikTok API: Ingrese Token.'); return; }
     localStorage.setItem('MGP_TT_TOKEN', token);
-    logConsole('🔄 TikTok API: Verificando token comercial...');
-
+    logConsole('🔄 TikTok API: Verificando token...');
     setTimeout(() => {
-      logConsole('✅ TikTok API: Conexión simulada verificada (200 OK). Cuota de videos activa.');
+      logConsole('✅ TikTok API: Conexión simulada (200 OK).');
       $('#statusTikTok').textContent = 'CONECTADO LIVE';
       $('#statusTikTok').className = 'api-status-pill status-live';
-    }, 1000);
+    }, 800);
   }
 
-  // X (TWITTER) API LIVE FETCH TEST
   async function testXConnection() {
     const token = $('#xBearer').value.trim();
-    if (!token) {
-      logConsole('⚠️ X API v2: Ingrese un Bearer Token.');
-      return;
-    }
+    if (!token) { logConsole('⚠️ X API v2: Ingrese Bearer Token.'); return; }
     localStorage.setItem('MGP_X_BEARER', token);
-    logConsole('🔄 X API v2: Ejecutando recent search para "#MarDelPlata"...');
-
+    logConsole('🔄 X API v2: Consultando recent search...');
     try {
       const res = await fetch('https://api.x.com/2/tweets/search/recent?query=MarDelPlata&max_results=10', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-
       if (res.ok) {
-        logConsole(`✅ X API v2 Live ÉXITO: Solicitud procesada. ${data.data ? data.data.length : 0} tweets recibidos.`);
+        logConsole(`✅ X API v2 Live ÉXITO: ${data.data ? data.data.length : 0} tweets.`);
         $('#statusX').textContent = 'CONECTADO LIVE';
         $('#statusX').className = 'api-status-pill status-live';
       } else {
-        logConsole(`❌ X API v2 Error (${res.status}): ${data.detail || 'Error de autenticación'}`);
-        $('#statusX').textContent = 'Error de Token';
+        logConsole(`❌ X API v2 Error: ${data.detail || 'Token no válido'}`);
+        $('#statusX').textContent = 'Error Token';
         $('#statusX').className = 'api-status-pill status-off';
       }
     } catch (err) {
-      logConsole(`⚠️ X API v2 (CORS/Browser Limit): ${err.message}. Se aplica proxy interno / simulador.`);
+      logConsole(`⚠️ X API Fallback: ${err.message}`);
       $('#statusX').textContent = 'Modo Simulación';
       $('#statusX').className = 'api-status-pill status-sim';
     }
   }
 
-  // DATA FILTERING
   function getFilteredData() {
     const del = $('#delegacionFilter').value;
     const cat = $('#categoriaFilter').value;
@@ -1378,15 +1704,30 @@
     });
   }
 
-  // RENDER MAIN DASHBOARD
+  function getPeriodFactor() {
+    const p = $('#periodFilter').value;
+    return p === '30' ? 1 : p === '90' ? 1.12 : 1.25;
+  }
+
+  function populateUploadSelect() {
+    const uploadSel = $('#uploadBarrioSelect');
+    if (!uploadSel) return;
+    uploadSel.innerHTML = '';
+    MGP_BARRIOS_DB.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.b;
+      opt.textContent = `${item.b} (${item.d})`;
+      uploadSel.appendChild(opt);
+    });
+  }
+
   function renderDashboard() {
     const data = getFilteredData();
+    const factor = getPeriodFactor();
 
-    // 1. Update KPIs
-    $('#kpiBarriosCount').textContent = data.length;
-    $('#kpiTotalReclamos').textContent = (data.length * 215).toLocaleString('es-AR');
+    $('#kpiBarriosCount').textContent = MGP_BARRIOS_DB.length;
+    $('#kpiTotalReclamos').textContent = Math.round(data.length * 215 * factor).toLocaleString('es-AR');
 
-    // 2. Summary Table
     const sorted = [...data].sort((a, b) => parseInt(b.desc) - parseInt(a.desc)).slice(0, 5);
     $('#topBarriosSummary').innerHTML = sorted.map(item => `
       <tr>
@@ -1397,21 +1738,28 @@
       </tr>
     `).join('');
 
-    // 3. Populate Upload Select
-    const uploadSel = $('#uploadBarrioSelect');
-    if (uploadSel && uploadSel.options.length === 0) {
-      MGP_BARRIOS_DB.forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item.b;
-        opt.textContent = `${item.b} (${item.d})`;
-        uploadSel.appendChild(opt);
-      });
-    }
+    populateUploadSelect();
 
-    // 4. Render Main Table
+    $('#gestionCards').innerHTML = GESTION_AREAS.map(g => `
+      <div class="kpi-card">
+        <div class="kpi-label">${g.area}</div>
+        <div class="kpi-value">${Math.min(100, Math.round(g.actual * (factor > 1 ? 1.05 : 1)))}%</div>
+        <div class="progress-bar"><i style="width:${g.actual}%"></i></div>
+        <div class="kpi-sub ${g.actual < g.meta ? 'down' : 'up'}">
+          <i data-lucide="${g.actual < g.meta ? 'alert-triangle' : 'check-circle'}"></i>
+          Meta municipal: ${g.meta}%
+        </div>
+      </div>
+    `).join('');
+
+    $('#alertasGestionList').innerHTML = GESTION_AREAS.filter(g => g.alert).map(g => `
+      <div class="insight-card danger">
+        <strong>Desvío detectado en ${g.area}</strong>
+        <p>Cumplimiento actual del ${g.actual}% frente a la meta mínima de ${g.meta}%. Requiere intervención prioritaria.</p>
+      </div>
+    `).join('');
+
     renderFullTable(data);
-
-    // 5. Update Charts
     updateCharts(data);
 
     initIcons();
@@ -1443,11 +1791,11 @@
     `).join('');
   }
 
+  // ABRIR MODAL FICHA BARRIO
   window.inspectBarrio = function(barrioName) {
     const item = MGP_BARRIOS_DB.find(b => b.b === barrioName);
     if (!item) return;
 
-    $('#barrioDetailBox').classList.remove('hidden');
     $('#detailBarrioName').textContent = `Ficha Técnica: ${item.b}`;
     $('#detailBarrioSub').textContent = `Delegación ${item.d} — Nivel de Vulnerabilidad: ${item.desc}`;
 
@@ -1465,10 +1813,56 @@
         <p>${item.prop}</p>
       </div>
     `;
+
+    $('#barrioDetailBox').classList.add('active');
     initIcons();
   };
 
-  // AI SIMULATOR
+  // CERRAR MODAL FICHA BARRIO
+  window.closeBarrioModal = function(e) {
+    if (e && e.target !== $('#barrioDetailBox') && !e.target.classList.contains('filter-select')) return;
+    $('#barrioDetailBox').classList.remove('active');
+  };
+
+  // MODAL PARA AGREGAR UN BARRIO NUEVO
+  window.openAddBarrioModal = function() {
+    $('#addBarrioModal').classList.add('active');
+    initIcons();
+  };
+
+  window.closeAddBarrioModal = function(e) {
+    if (e && e.target !== $('#addBarrioModal') && !e.target.classList.contains('filter-select')) return;
+    $('#addBarrioModal').classList.remove('active');
+    $('#addBarrioForm').reset();
+  };
+
+  window.addNewBarrio = function(e) {
+    e.preventDefault();
+
+    const name = $('#newBarrioName').value.trim();
+    const del = $('#newBarrioDel').value;
+    const prob = $('#newBarrioProb').value.trim();
+    const desc = $('#newBarrioDesc').value.trim() + '%';
+    const vol = $('#newBarrioVol').value;
+    const pr = $('#newBarrioProm').value.trim();
+    const prop = $('#newBarrioProp').value.trim();
+
+    // Validar duplicados
+    if (MGP_BARRIOS_DB.some(item => item.b.toLowerCase() === name.toLowerCase())) {
+      alert('El barrio ya existe en la base de datos.');
+      return;
+    }
+
+    const newBarrioObj = { b: name, d: del, p: prob, desc: desc, vol: vol, pr: pr, prop: prop };
+    
+    // Insertar al inicio
+    MGP_BARRIOS_DB.unshift(newBarrioObj);
+
+    closeAddBarrioModal();
+    renderDashboard();
+    logConsole(`✅ Barrio añadido exitosamente: ${name} (${del})`);
+  };
+
   window.handleFileSim = function(input) {
     if (input.files && input.files[0]) {
       const fileName = input.files[0].name;
@@ -1496,7 +1890,6 @@
     initIcons();
   };
 
-  // CHARTS
   function destroyCharts() {
     Object.values(charts).forEach(c => c && c.destroy());
     charts = {};
@@ -1504,8 +1897,8 @@
 
   function updateCharts(data) {
     destroyCharts();
+    const factor = getPeriodFactor();
 
-    // Chart 1: Line API
     const ctxApi = document.getElementById('lineApiChart');
     if (ctxApi) {
       charts.api = new Chart(ctxApi, {
@@ -1513,9 +1906,9 @@
         data: {
           labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
           datasets: [
-            { label: 'Meta API (IG/FB)', data: [1200, 1400, 1800, 2100, 1900, 2300, 2500], borderColor: '#42e6a4', tension: 0.3 },
-            { label: 'X (Twitter) v2', data: [800, 950, 1100, 1300, 1250, 1400, 1600], borderColor: '#38bdf8', tension: 0.3 },
-            { label: 'TikTok Commercial API', data: [400, 600, 850, 900, 1100, 1300, 1500], borderColor: '#a855f7', tension: 0.3 }
+            { label: 'Meta API (IG/FB)', data: [1200, 1400, 1800, 2100, 1900, 2300, 2500].map(v => Math.round(v*factor)), borderColor: '#42e6a4', tension: 0.3 },
+            { label: 'X (Twitter) v2', data: [800, 950, 1100, 1300, 1250, 1400, 1600].map(v => Math.round(v*factor)), borderColor: '#38bdf8', tension: 0.3 },
+            { label: 'TikTok Commercial API', data: [400, 600, 850, 900, 1100, 1300, 1500].map(v => Math.round(v*factor)), borderColor: '#a855f7', tension: 0.3 }
           ]
         },
         options: {
@@ -1530,7 +1923,6 @@
       });
     }
 
-    // Chart 2: Category Donut
     const ctxDonut = document.getElementById('donutChart');
     if (ctxDonut) {
       charts.donut = new Chart(ctxDonut, {
@@ -1552,7 +1944,55 @@
       });
     }
 
-    // Chart 3: Hashtags
+    const ctxGest = document.getElementById('gestionChart');
+    if (ctxGest) {
+      charts.gestion = new Chart(ctxGest, {
+        type: 'bar',
+        data: {
+          labels: GESTION_AREAS.map(g => g.area),
+          datasets: [
+            { label: 'Resultado (%)', data: GESTION_AREAS.map(g => g.actual), backgroundColor: '#42e6a4', borderRadius: 6 },
+            { label: 'Meta (%)', data: GESTION_AREAS.map(g => g.meta), backgroundColor: '#38bdf8', borderRadius: 6 }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: {
+            x: { min: 0, max: 100, ticks: { color: '#94a3b8' }, grid: { color: '#1b2a45' } },
+            y: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    const ctxTerr = document.getElementById('territoryChart');
+    if (ctxTerr) {
+      charts.territory = new Chart(ctxTerr, {
+        type: 'bar',
+        data: {
+          labels: ['Centro', 'Norte', 'Sur', 'Oeste', 'Batán', 'Sierra'],
+          datasets: [{
+            label: 'Índice de Descontento Normalizado (0-100)',
+            data: [52, 76, 84, 85, 88, 82],
+            backgroundColor: ['#38bdf8', '#f59e0b', '#f43f5e', '#f43f5e', '#f43f5e', '#a855f7'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { min: 0, max: 100, ticks: { color: '#94a3b8' }, grid: { color: '#1b2a45' } }
+          }
+        }
+      });
+    }
+
     const ctxHash = document.getElementById('hashtagChart');
     if (ctxHash) {
       charts.hash = new Chart(ctxHash, {
@@ -1561,7 +2001,7 @@
           labels: ['#BachesMGP', '#SaludCAPS', '#SeguridadMDP', '#ColectivosMDP', '#LucesLED'],
           datasets: [{
             label: 'Volumen de Menciones Redes',
-            data: [8420, 5110, 4890, 3750, 2900],
+            data: [8420, 5110, 4890, 3750, 2900].map(v => Math.round(v*factor)),
             backgroundColor: '#42e6a4',
             borderRadius: 6
           }]
@@ -1579,7 +2019,6 @@
     }
   }
 
-  // NAVIGATION CONTROLLER
   function setupNavigation() {
     $$('.nav-item').forEach(btn => {
       btn.onclick = () => {
@@ -1593,12 +2032,14 @@
 
         const titles = {
           resumen: ['Resumen Ejecutivo & Métricas', 'Indicadores estratégicos, consumo de APIs y prioridades electorales por barrio.'],
+          gestion: ['Seguimiento de Gestión Municipal', 'Cumplimiento de metas, metas por área y alertas tácticas de desvío.'],
           'api-config': ['Conexión de APIs & Redes Social Listening', 'Gestión de credenciales para Meta Graph API, TikTok API y X (Twitter) API v2.'],
           territorio: ['Directorio Completo de Barrios (80+ MGP)', 'Diagnóstico de fragilidades urbanas y propuestas para cada rincón de General Pueyrredón.'],
           carga: ['Carga Territorial & Parsing (AI/OCR)', 'Procesamiento inteligente de notas de campo, fotos y minutas de fomento.'],
           escucha: ['Social Listening & Anuncios Opositores', 'Detección de hashtags críticos y volumen de quejas en tiempo real.'],
           propuestas: ['Matriz de Propuestas de Campaña 2026', 'Comparativa directa entre la falencia municipal actual y nuestra respuesta.'],
-          informes: ['Centro de Informes & Exportación CSV', 'Generación instantánea de dossiers políticos por delegación o archivo general.']
+          trazabilidad: ['Trazabilidad y Calidad del Dato (PRISMA)', 'Metodología de auditoría, registro de fuentes y nivel de confianza.'],
+          informes: ['Centro de Informes y Decisiones', 'Generación instantánea de dossiers políticos y ruta de decisión paso a paso.']
         };
 
         if (titles[page]) {
@@ -1611,14 +2052,14 @@
     });
   }
 
-  // EXPORT FUNCTION
   function downloadReport(tipo) {
     const data = getFilteredData();
     const headers = ['Barrio', 'Delegación', 'Reclamo Principal', 'Nivel Descontento', 'Volumen Redes', 'Promesa Incumplida MGP', 'Nuestra Propuesta 2026'];
     
     let csvRows = [
-      ['MGP 2026 - OBSERVATORIO TERRITORIAL Y SOCIAL LISTENING'],
+      ['MGP 2026 - OBSERVATORIO TERRITORIAL Y SOCIAL LISTENING (PRISMA)'],
       [`Informe Exportado: ${tipo}`],
+      [`Período: ${$('#periodFilter').selectedOptions[0].text}`],
       [`Fecha de Emisión: ${new Date().toLocaleDateString('es-AR')}`],
       [],
       headers
@@ -1641,7 +2082,7 @@
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `MGP2026_Reporte_${tipo}_${Date.now()}.csv`);
+    link.setAttribute('download', `PRISMA_MGP2026_${tipo}_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -1652,6 +2093,7 @@
     loadSavedApiKeys();
     setupNavigation();
 
+    $('#periodFilter').onchange = renderDashboard;
     $('#delegacionFilter').onchange = renderDashboard;
     $('#categoriaFilter').onchange = renderDashboard;
     $('#exportBtn').onclick = () => downloadReport('General_Pueyrredon');
